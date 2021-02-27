@@ -1,0 +1,8 @@
+whitenoise==5.2.0  # https://github.com/evansd/whitenoise
+argon2-cffi==20.1.0  # https://github.com/hynek/argon2_cffi
+
+# Django
+# ------------------------------------------------------------------------------
+django==3.1.7  # https://www.djangoproject.com/
+django-environ==0.4.5  # https://github.com/joke2k/django-environ
+django-allauth==0.44.0  # https://github.com/pennersr/django-allauth
