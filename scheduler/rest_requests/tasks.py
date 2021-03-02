@@ -21,20 +21,29 @@ def process_request(request_schedule_id):
         schedule.rest_request.headers,
     )
 
-    if not response.get("ok", False):
+    # server error
+    if not response:
         response = {
             "success": False,
             "error": {
-                "code": response.get("status_code", "500"),
-                "message": response.get("reason", "Server Error"),
+                "message": "scheduled request failed",
             },
         }
         schedule.response_data = response
         schedule.status = Status.FAILED
         schedule.retry += 1
         schedule.save()
-        return
+        return {"success": False}
 
+    # request with http error
+    if not response.ok:
+        schedule.response_data = response.json()
+        schedule.status = Status.FAILED
+        schedule.retry += 1
+        schedule.save()
+        return {"success": False}
+
+    # successive request call
     schedule.response_data = response.json()
     schedule.status = Status.PROCESSED
     schedule.save_related()

@@ -1,5 +1,6 @@
 import logging
-from requests import Request, Session, ConnectionError
+
+from requests import ConnectionError, HTTPError, Request, Session
 from requests.exceptions import RequestException
 
 logger = logging.getLogger(__name__)
@@ -35,11 +36,15 @@ def make_request(method, url, json_body, headers):
 
     try:
         response = s.send(prepped)
+        response.raise_for_status()
+    except HTTPError:
+        return response
     except ConnectionError:
         logger.error("ConnectionError", exc_info=True)
-        response = {"ok": False, "reason": "ConnectionError"}
     except RequestException:
         logger.error("RequestException", exc_info=True)
-        response = {"ok": False, "reason": "RequestException"}
 
-    return response
+    if response:
+        return response
+
+    return False
