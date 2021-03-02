@@ -1,4 +1,3 @@
-import logging
 from celery import current_app
 
 from config.celery_app import app as task_app

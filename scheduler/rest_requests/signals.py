@@ -1,11 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from .apps import RestRequestsConfig
-from .models import RequestSchedule, RestRequest
 
 
 def create_default_permissions(sender, **kwargs):
@@ -19,10 +15,10 @@ def create_default_permissions(sender, **kwargs):
         )
         default_user_group.permissions.add(*request_schedule_permissions)
 
-        # RestRequest permissions
+        #  permissions
         rest_request_permissions = Permission.objects.filter(
             content_type__app_label="rest_requests",
-            content_type__model="restrequest",
+            content_type__model="",
         )
         default_user_group.permissions.add(*rest_request_permissions)
 

@@ -3,8 +3,8 @@ Production settings.
 """
 
 from .base import *  # noqa
-from .base import DATABASES, TEMPLATES  # noqa
 from .base import env  # noqa
+from .base import DATABASES, TEMPLATES
 
 # GENERAL
 # ------------------------------------------------------------------------------

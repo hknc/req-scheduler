@@ -8,6 +8,7 @@ class RestRequestsConfig(AppConfig):
 
     def ready(self):
         from django.db.models.signals import post_migrate
-        from .signals import create_default_permissions, add_default_user_group
+
+        from .signals import add_default_user_group, create_default_permissions  # noqa
 
         post_migrate.connect(create_default_permissions, sender=self)

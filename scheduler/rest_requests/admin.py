@@ -1,6 +1,7 @@
 from django.contrib import admin
-from scheduler.rest_requests.models import RestRequest, RequestSchedule
 from django.contrib.auth import get_user_model
+
+from scheduler.rest_requests.models import RequestSchedule, RestRequest
 
 User = get_user_model()
 
