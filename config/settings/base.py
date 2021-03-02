@@ -45,12 +45,13 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
     "django_celery_beat",
 ]
 
 LOCAL_APPS = [
-    "scheduler.users",
-    "scheduler.rest_requests",
+    "scheduler.users.apps.UsersConfig",
+    "scheduler.rest_requests.apps.RestRequestsConfig",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -91,6 +92,8 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                # `allauth` needs this from django
+                "django.template.context_processors.request",
             ],
         },
     },
@@ -178,9 +181,9 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "/admin"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "login"
+# LOGIN_URL = "login"
 
 # LOGGING
 # ------------------------------------------------------------------------------
