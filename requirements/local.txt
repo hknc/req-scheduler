@@ -1,6 +1,8 @@
 -r base.txt
 
 psycopg2==2.8.6  # https://github.com/psycopg/psycopg2
+watchgod==0.6  # https://github.com/samuelcolvin/watchgod
+debugpy==1.2.1  # https://github.com/microsoft/debugpy
 
 # Code quality
 # ------------------------------------------------------------------------------
