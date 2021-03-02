@@ -6,8 +6,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
+from .utils import schedule, revoke
 
 User = get_user_model()
+
+REQUEST_MAX_RETRY = 3
 
 
 def get_default_schedule_datetime():
@@ -86,9 +89,42 @@ class RequestSchedule(models.Model):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
 
+    def schedule(self):
+        if self.status in (Status.PROCESSED, Status.CANCELLED):
+            return
+        # set scheduled datetime at least one minute ahead
+        default_schedule_datetime = get_default_schedule_datetime()
+        now_30sec = timezone.localtime(timezone.now()) + timedelta(seconds=30)
+        if self.scheduled_date_time.timestamp() < now_30sec.timestamp():
+            self.scheduled_date_time = default_schedule_datetime
+
+        task_id = schedule(self.id, self.scheduled_date_time)
+        if task_id:
+            if not self.task_id == "":
+                revoke(self.task_id)
+            self.task_id = task_id
+            self.status = Status.PENDING
+            self.save(skip_schedule=True)
+
     class Meta:
         verbose_name = _("Request schedule")
         verbose_name_plural = _("Request schedules")
 
     def __str__(self):
         return f"{str(timezone.localtime(self.scheduled_date_time))}"
+
+    def save(self, *args, **kwargs):
+        if kwargs.pop("skip_schedule", False):
+            super().save(*args, **kwargs)
+            return
+
+        if self.retry > REQUEST_MAX_RETRY:
+            self.status = Status.CANCELLED
+
+        super().save(*args, **kwargs)
+        # schedule for processing
+        self.schedule()
+
+    def save_related(self):
+        self.rest_request.save()
+        self.save()
