@@ -32,3 +32,13 @@ Online Demo
 -------------
 
 .. _`Demo app deployed to heroku -> https://req-scheduler.herokuapp.com/`: https://req-scheduler.herokuapp.com/
+
+
+TODOS
+-------------
+- units tests for **RequestSchedule** model's **schedule** method
+- units tests for **RequestSchedule** model's **save** method
+- units tests for **make_request** services method
+- units tests for **process_request** task
+- prevent IPv4 & IPv6 unsafe networks being adding as a url host
+    - .. _`IPv4 & IPv6 unsafe networks`: https://github.com/crunch-io/requests-safe#ipv4-unsafe-networks
