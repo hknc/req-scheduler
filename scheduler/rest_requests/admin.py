@@ -17,8 +17,12 @@ class RequestScheduleAdmin(admin.ModelAdmin):
         "scheduled_date_time",
         "status",
         "response_data",
+        "retry",
     )
-    readonly_fields = ("response_data",)
+    readonly_fields = (
+        "response_data",
+        "retry",
+    )
     list_filter = ("status", "rest_request__method")
 
     def get_queryset(self, request):

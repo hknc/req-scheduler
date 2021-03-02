@@ -12,7 +12,7 @@ def process_request(request_schedule_id):
     try:
         schedule = RequestSchedule.objects.get(id=request_schedule_id)
     except ObjectDoesNotExist:
-        return {"success": False, "message": "RequestScheduleDoesNotExist"}
+        return {"success": False, "error": {"message": "RequestScheduleDoesNotExist"}}
 
     response = make_request(
         schedule.rest_request.method,
@@ -20,11 +20,20 @@ def process_request(request_schedule_id):
         schedule.rest_request.body,
         schedule.rest_request.headers,
     )
-    if not response:
+
+    if not response.get("ok", False):
+        response = {
+            "success": False,
+            "error": {
+                "code": response.get("status_code", "500"),
+                "message": response.get("reason", "Server Error"),
+            },
+        }
+        schedule.response_data = response
         schedule.status = Status.FAILED
         schedule.retry += 1
         schedule.save()
-        return {"success": False}
+        return
 
     schedule.response_data = response.json()
     schedule.status = Status.PROCESSED

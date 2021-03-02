@@ -118,7 +118,7 @@ class RequestSchedule(models.Model):
             super().save(*args, **kwargs)
             return
 
-        if self.retry > REQUEST_MAX_RETRY:
+        if self.retry >= REQUEST_MAX_RETRY:
             self.status = Status.CANCELLED
 
         super().save(*args, **kwargs)
