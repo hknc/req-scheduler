@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "scheduler.users",
+    "scheduler.rest_requests",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
