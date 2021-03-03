@@ -12,11 +12,12 @@ from .utils import revoke, schedule
 User = get_user_model()
 
 REQUEST_MAX_RETRY = 3
+REQUEST_MIN_DELAY_SECONDS = 5
 
 
 def get_default_schedule_datetime():
-    # set default scheduled datetime at least one minute ahead
-    return make_aware(datetime.now() + timedelta(minutes=1))
+    # set default scheduled datetime to future
+    return make_aware(datetime.now() + timedelta(seconds=REQUEST_MIN_DELAY_SECONDS))
 
 
 class Status(models.IntegerChoices):
@@ -81,7 +82,7 @@ class RequestSchedule(models.Model):
         default=Status.NOT_SET,
     )
     task_id = models.CharField(blank=True, max_length=256)
-    response_data = models.JSONField(_("Rest response"), blank=True, null=True)
+    response_data = models.JSONField(_("JSON response"), blank=True, null=True)
     retry = models.IntegerField(
         _("Retry"),
         default=0,
@@ -91,12 +92,18 @@ class RequestSchedule(models.Model):
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
 
     def schedule(self):
-        if self.status in (Status.PROCESSED, Status.CANCELLED):
+        # don't schedule for these statuses
+        if self.status in (
+            Status.PROCESSED,
+            Status.PROCESSING,
+            Status.FAILED,
+            Status.CANCELLED,
+        ):
             return
-        # set scheduled datetime at least one minute ahead
+        # set scheduled datetime to future
         default_schedule_datetime = get_default_schedule_datetime()
-        now_30sec = timezone.localtime(timezone.now()) + timedelta(seconds=30)
-        if self.scheduled_date_time.timestamp() < now_30sec.timestamp():
+        now_5sec = timezone.localtime(timezone.now()) + timedelta(seconds=5)
+        if self.scheduled_date_time.timestamp() < now_5sec.timestamp():
             self.scheduled_date_time = default_schedule_datetime
 
         task_id = schedule(self.id, self.scheduled_date_time)
@@ -120,7 +127,8 @@ class RequestSchedule(models.Model):
             return
 
         if self.retry >= REQUEST_MAX_RETRY:
-            self.status = Status.CANCELLED
+            self.status = Status.FAILED
+            revoke(self.task_id)
 
         super().save(*args, **kwargs)
         # schedule for processing
