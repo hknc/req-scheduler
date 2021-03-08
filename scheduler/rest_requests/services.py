@@ -48,6 +48,8 @@ def make_request(method, url, json_body, headers):
 
         response = s.send(prepped)
 
+        return response
+
     except ConnectionError as err:
         logger.error("Error connecting: ", err)
     except Timeout as err:
@@ -55,5 +57,3 @@ def make_request(method, url, json_body, headers):
     except RequestException as err:
         logger.error("Error: ", err)
         raise FailedRequestError()
-
-    return response
