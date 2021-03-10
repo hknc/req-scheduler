@@ -28,12 +28,6 @@ To run commands::
     $ docker-compose -f local.yml run --rm django python manage.py migrate
 
 
-Online Demo
--------------
-
-- `Demo app deployed to heroku -> <https://req-scheduler.herokuapp.com/>`_
-
-
 TODOS
 -------------
 - units tests for **RequestSchedule** model's **schedule** method
